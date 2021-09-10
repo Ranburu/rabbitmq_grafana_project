@@ -1,0 +1,44 @@
+---
+# This role will install rabbitMQ and rabbitmq_management plugin.
+
+- name: Get epel repository
+  command: wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+- name: Install epel repository
+  command: rpm -Uvh epel-release-latest-7*.rpm
+
+- name: Get remi repository
+  command: wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+
+- name: Install remi repository
+  command: rpm -Uvh remi-release-7*.rpm
+
+- name: Install Erlang package
+  yum: name=erlang state=present
+
+- name: Get rabbitmq repository
+  command: wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.5/rabbitmq-server-3.9.5-1.el7.noarch.rpm
+
+- name: Import repository key
+  command: rpm --import https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+
+- name: Install rabbitmq
+  yum: name=rabbitmq-server-3.9.5-1.el7.noarch.rpm state=present
+
+- name: Allow incoming TCP traffic on ports
+  command: firewall-cmd --zone=public --permanent --add-port=4369/tcp --add-port=5671-5672/tcp --add-port=25672/tcp --add-port=15672-15675/tcp  --add-port=61613-61614/tcp --add-port=1883/tcp --add-port=15674/tcp
+
+- name: Reload firewall
+  command: firewall-cmd --reload
+
+- name: Mark rabbitmq to start automatically on reboots
+  command: systemctl enable rabbitmq-server
+
+- name: Start rabbitmq
+  command: systemctl start rabbitmq-server
+
+- name: Install rabbitmq_management plugin
+  command: rabbitmq-plugins enable rabbitmq_management
+
+- name: Give rights to rabbitmq
+  command: chown -R rabbitmq:rabbitmq /var/lib/rabbitmq/
