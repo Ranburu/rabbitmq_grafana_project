@@ -1,5 +1,5 @@
 [rabbitmq]
-ip address
+192.168.122.71
 
 [monitoring]
-ip address
+
