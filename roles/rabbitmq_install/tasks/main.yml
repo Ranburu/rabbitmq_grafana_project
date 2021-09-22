@@ -1,19 +1,5 @@
 ---
 # This role will install rabbitMQ and rabbitmq_management plugin.
-- name: Install wget
-  yum:
-    name: wget
-    state: present
-
-#- name: Install epel repository
-#  yum:
-#    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-#    state: present
-
-#- name: Install remi repository
-#  yum:
-#   name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
-#    state: present
 
 - name: Install Erlang package
   yum:
@@ -49,3 +35,33 @@
 
 - name: Give rights to rabbitmq
   command: chown -R rabbitmq:rabbitmq /var/lib/rabbitmq/
+
+- name: Install epel reposytory
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install python 3
+  yum:
+    name: python3
+    state: present
+
+#- name: Create hard link to python 3.6
+#  command: ln -fs /usr/bin/python3.6 /usr/bin/python
+
+- name: Install pip
+  yum:
+    name: python-pip
+    state: present
+
+#- name: Upgrade pip
+#  pip:
+#    name: pip
+#    state: latest
+#  vars:
+#    ansible_python_interpreter: /usr/bin/python3
+
+- name: Install requests via pip
+  pip:
+    name: requests
+    state: present

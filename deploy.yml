@@ -7,3 +7,4 @@
 
   roles:
   - rabbitmq_install
+  - rabbitmq_setup
