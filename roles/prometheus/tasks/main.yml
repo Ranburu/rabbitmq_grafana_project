@@ -1,0 +1,95 @@
+---
+# This role installs and configure prometheus on the server.
+
+#- name: Disable SELinux
+#  selinux:
+#    state: disabled
+#
+#- name: Unconditionally reboot the machine with all defaults
+#  reboot:
+
+- name: Create user for prometheus service
+  user:
+    name: "{{ prometheus_user }}"
+    create_home: no
+    shell: /bin/false
+    state: present
+
+- name: Create dirrectories for prometheus
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+  loop: "{{ prometheus_directories }}"
+
+- name: Download and unarchive prometheus
+  unarchive:
+    remote_src: yes
+    src: "{{ prometheus_source }}"
+    dest: /opt/prometheus
+
+- name: Move prometheus files to bin folder
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    remote_src: yes
+    mode: a+x
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+  loop: "{{ prometheus_bin_files }}"
+
+#- name: Reset SELinux context to prometheus
+#  command: restorecon -rv /usr/local/bin/prometheus
+#
+#- name: Reset SELinux context to promtool
+#  command: restorecon -rv /usr/local/bin/promtool
+
+- name: Move prometheus console files
+  copy:
+    src: "{{ item }}"
+    dest: /etc/prometheus
+    remote_src: yes
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+    directory_mode: yes
+  loop: "{{ prometheus_console_files }}"
+
+- name: Create prometheus.yml file
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+
+- name: Create prometheus service
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+
+- name: Change owner of data prometheus file
+  file:
+    path: /var/lib/prometheus/
+    group: "{{ prometheus_group }}"
+    owner: "{{ prometheus_user }}"
+    recurse: yes
+
+- name: Start and enable prometheus service
+  systemd:
+    name: prometheus
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: Allow incoming TCP traffic on ports
+  firewalld:
+    port: "{{ prometheus_ports }}"
+    state: enabled
+    permanent: yes
+
+- name: Reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded

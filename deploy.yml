@@ -8,3 +8,10 @@
   roles:
   - rabbitmq_install
   - rabbitmq_setup
+
+#- hosts: monitoring
+#  remote_user: root
+#
+#  roles:
+#  - prometheus
+#  - grafana

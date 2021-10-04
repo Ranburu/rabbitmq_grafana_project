@@ -2,25 +2,31 @@
 # This role will install rabbitMQ and rabbitmq_management plugin.
 
 - name: Install Erlang package
-  yum:
-    name: https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_23.2-1~centos~7_amd64.rpm
+  package:
+    name: "{{ rabbitmq_erlang_src }}"
     state: present
 
 - name: Import key
   rpm_key:
+    key: "{{ rabbitmq_key }}"
     state: present
-    key: https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
 
 - name: Install rabbitmq
-  yum:
-    name: https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.5/rabbitmq-server-3.9.5-1.el7.noarch.rpm
+  package:
+    name: "{{ rabbitmq_src }}"
     state: present
 
 - name: Allow incoming TCP traffic on ports
-  command: firewall-cmd --zone=public --permanent --add-port=4369/tcp --add-port=5671-5672/tcp --add-port=25672/tcp --add-port=15672-15675/tcp  --add-port=61613-61614/tcp --add-port=1883/tcp --add-port=15674/tcp
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: yes
+  loop: "{{ rabbitmq_ports }}"
 
-- name: Reload firewall
-  command: firewall-cmd --reload
+- name: Reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
 
 - name: Start rabbitmq and enable to start automatically on reboots.
   systemd:
@@ -30,38 +36,70 @@
 
 - name: Install rabbitmq_management plugin
   rabbitmq_plugin:
-    names: rabbitmq_management
+    names: "{{ rabbitmq_plugins }}"
     state: enabled
 
 - name: Give rights to rabbitmq
-  command: chown -R rabbitmq:rabbitmq /var/lib/rabbitmq/
+  file:
+    path: "{{ rabbitmq_path }}"
+    owner: "{{ rabbitmq_user }}"
+    group: "{{ rabbitmq_group }}"
+    recurse: yes
 
-- name: Install epel reposytory
-  yum:
-    name: epel-release
+- name: Install required packages
+  package:
+    name: "{{ item }}"
     state: present
-
-- name: Install python 3
-  yum:
-    name: python3
-    state: present
-
-#- name: Create hard link to python 3.6
-#  command: ln -fs /usr/bin/python3.6 /usr/bin/python
-
-- name: Install pip
-  yum:
-    name: python-pip
-    state: present
-
-#- name: Upgrade pip
-#  pip:
-#    name: pip
-#    state: latest
-#  vars:
-#    ansible_python_interpreter: /usr/bin/python3
+  loop: "{{ rabbitmq_packages }}"
 
 - name: Install requests via pip
   pip:
-    name: requests
+    name: "{{ rabbitmq_pip_modules }}"
     state: present
+
+- name: Create directory for rabbitmq
+  file:
+    path: "{{ rabbitmq_directory }}"
+    state: directory
+    group: "{{ rabbitmq_group }}"
+    owner: "{{ rabbitmq_user }}"
+
+- name: Download and unarchive rabbitmq exporter
+  unarchive:
+    remote_src: yes
+    src: "{{ rabbitmq_exporter_source }}"
+    dest: "{{ rabbitmq_directory }}"
+
+- name: Create user for rabbitmq exporter service
+  user:
+    name: "{{ rabbitmq_exporter_user }}"
+    create_home: no
+    shell: /bin/false
+    state: present
+
+
+- name: Move rabbitmq exporter file to bin folder
+  copy:
+    src: "{{ rabbitmq_exporter_directory }}"
+    dest: /usr/local/bin/rabbitmq_exporter
+    remote_src: yes
+    mode: a+x
+    group: "{{ rabbitmq_exporter_group }}"
+    owner: "{{ rabbitmq_exporter_user }}"
+
+- name: Create rabbitmq exporter service
+  template:
+    src: rabbitmq_exporter.service.j2
+    dest: /etc/systemd/system/rabbitmq_exporter.service
+    group: "{{ rabbitmq_exporter_group }}"
+    owner: "{{ rabbitmq_exporter_user }}"
+
+#- name: Reset SELinux context to rabbitmq exporter
+#  command: restorecon -rv /usr/local/bin/rabbitmq_exporter
+
+- name: Start and enable rabbitmq exporter service
+  systemd:
+    name: rabbitmq_exporter
+    daemon_reload: yes
+    state: started
+    enabled: yes

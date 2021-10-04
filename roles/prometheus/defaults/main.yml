@@ -1,0 +1,23 @@
+---
+# Defaults file for prometheus role
+
+prometheus_user: "prometheus"
+prometheus_group: "{{ prometheus_user }}"
+prometheus_directories:
+  - /etc/prometheus
+  - /var/lib/prometheus
+  - /opt/prometheus
+prometheus_bin_files:
+  - /opt/prometheus/prometheus-{{prometheus_version}}.linux-amd64/prometheus
+  - /opt/prometheus/prometheus-{{prometheus_version}}.linux-amd64/promtool
+prometheus_console_files:
+  - /opt/prometheus/prometheus-{{prometheus_version}}.linux-amd64/consoles
+  - /opt/prometheus/prometheus-{{prometheus_version}}.linux-amd64/console_libraries
+prometheus_version: 2.30.0
+prometheus_ports: "9090/tcp"
+prometheus_source: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+
+prometheus_hosts: "localhost"
+prometheus_exporter_port: 9090
+prometheus_rabbitmq_hosts: "{{ groups['rabbitmq'] | first }}"
+prometheus_rabbitmq_exporter_port: 9419

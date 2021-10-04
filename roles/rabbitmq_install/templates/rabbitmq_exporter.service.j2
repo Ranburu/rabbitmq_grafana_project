@@ -1,0 +1,13 @@
+[Unit]
+Description=rabbitmq_exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ rabbitmq_exporter_user }}
+Group={{ rabbitmq_exporter_group }}
+Type=simple
+ExecStart=/usr/local/bin/rabbitmq_exporter
+
+[Install]
+WantedBy=multi-user.target

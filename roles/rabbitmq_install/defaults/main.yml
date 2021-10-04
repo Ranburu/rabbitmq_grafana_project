@@ -1,0 +1,32 @@
+---
+# Defaults file for rabbitmq_install role
+
+rabbitmq_centos_version: 7
+rabbitmq_erlang_version: 23.2-1
+rabbitmq_version: 3.9.5
+rabbitmq_path: "/var/lib/rabbitmq/"
+rabbitmq_user: "rabbitmq"
+rabbitmq_group: "{{ rabbitmq_user }}"
+rabbitmq_directory: "/opt/rabbitmq/"
+rabbitmq_exporter_user: "rabbitmq-exporter"
+rabbitmq_exporter_group: "{{ rabbitmq_exporter_user }}"
+rabbitmq_exporter_directory: "/opt/rabbitmq/rabbitmq_exporter-1.0.0-RC8.linux-amd64/rabbitmq_exporter"
+rabbitmq_ports:
+  - 4369/tcp
+  - 5671-5672/tcp
+  - 25672/tcp
+  - 15672-15675/tcp
+  - 61613-61614/tcp
+  - 1883/tcp
+  - 15674/tcp
+  - 9419/tcp
+rabbitmq_packages:
+  - epel-release
+  - python3
+  - python-pip
+rabbitmq_pip_modules: "requests"
+rabbitmq_plugins: "rabbitmq_management"
+rabbitmq_exporter_source: "https://github.com/kbudde/rabbitmq_exporter/releases/download/v1.0.0-RC8/rabbitmq_exporter-1.0.0-RC8.linux-amd64.tar.gz"
+rabbitmq_erlang_src: "https://packages.erlang-solutions.com/erlang/rpm/centos/{{rabbitmq_centos_version}}/x86_64/esl-erlang_{{rabbitmq_erlang_version}}~centos~{{rabbitmq_centos_version}}_amd64.rpm"
+rabbitmq_key: "https://www.rabbitmq.com/rabbitmq-release-signing-key.asc"
+rabbitmq_src: "https://github.com/rabbitmq/rabbitmq-server/releases/download/v{{rabbitmq_version}}/rabbitmq-server-{{rabbitmq_version}}-1.el{{rabbitmq_centos_version}}.noarch.rpm"
