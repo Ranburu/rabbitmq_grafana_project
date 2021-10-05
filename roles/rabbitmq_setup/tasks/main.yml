@@ -2,35 +2,32 @@
 # Role for creating base environment in RabbitMQ.
 - name: Create new vhost
   rabbitmq_vhost:
-    name: main
+    name: "{{ rabbitmq_setup_vhost }}"
     state: present
 
-- name: Create three users
+- name: Create users
   rabbitmq_user:
     user: "{{ item }}"
-    password: standart
-    vhost: main
+    password: "{{ rabbitmq_setup_password }}"
+    vhost: "{{ rabbitmq_setup_vhost }}"
     configure_priv: .*
     read_priv: .*
     write_priv: .*
     state: present
     tags: administrator
-  with_items:
-    - admin
-    - monitoring
-    - service_x
+  loop: "{{ rabbitmq_setup_users }}"
 
 - name: Create new exchange
   rabbitmq_exchange:
     name: firstExchange
-    vhost: main
-    login_user: admin
-    login_password: standart
+    vhost: "{{ rabbitmq_setup_vhost }}"
+    login_user: "{{ rabbitmq_setup_admin }}"
+    login_password: "{{ rabbitmq_setup_password }}"
 
 - name: Create new queue
   rabbitmq_queue:
     name: myRemoteQueue
     state: present
-    vhost: main
-    login_user: admin
-    login_password: standart
+    vhost: "{{ rabbitmq_setup_vhost }}"
+    login_user: "{{ rabbitmq_setup_admin }}"
+    login_password: "{{ rabbitmq_setup_password }}"

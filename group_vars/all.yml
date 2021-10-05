@@ -1,0 +1,5 @@
+---
+# Vars for all hosts and roles.
+
+prometheus_port: 9090
+rabbitmq_exporter_port: 9419

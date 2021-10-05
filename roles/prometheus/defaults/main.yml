@@ -18,6 +18,5 @@ prometheus_ports: "9090/tcp"
 prometheus_source: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
 
 prometheus_hosts: "localhost"
-prometheus_exporter_port: 9090
 prometheus_rabbitmq_hosts: "{{ groups['rabbitmq'] | first }}"
-prometheus_rabbitmq_exporter_port: 9419
+prometheus_rabbitmq_exporter_port: "{{ rabbitmq_exporter_port }}"

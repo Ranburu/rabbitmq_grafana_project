@@ -1,0 +1,9 @@
+---
+# Defaults file for rabbitmq_setup role.
+rabbitmq_setup_admin: admin
+rabbitmq_setup_password: standart
+rabbitmq_setup_users:
+  - "{{ rabbitmq_setup_admin }}"
+  - monitoring
+  - service_x
+rabbitmq_setup_vhost: main

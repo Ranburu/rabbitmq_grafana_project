@@ -1,0 +1,23 @@
+---
+# Defaults file for grafana role.
+grafana_user: grafana
+grafana_group: "{{ grafana_user }}"
+grafana_version: 8.1.5
+grafana_port: 3000
+grafana_ports:
+  - "{{grafana_port}}/tcp"
+grafana_directories:
+  - /opt/grafana
+grafana_dashboards:
+  - /opt/grafana/rabbitmq.json
+  - /opt/grafana/statistics.json
+grafana_host: "{{ groups['monitoring'] | first }}"
+grafana_url: "http://{{grafana_host}}:{{grafana_port}}"
+grafana_prometheus_host: "{{ groups['monitoring'] | first }}"
+grafana_prometheus_port: "{{ prometheus_port }}"
+grafana_prometheus_url: "http://{{grafana_prometheus_host}}:{{grafana_prometheus_port}}"
+grafana_src: "https://dl.grafana.com/oss/release/grafana-{{grafana_version}}-1.x86_64.rpm"
+
+grafana_rabbitmq_host: "{{ groups['rabbitmq'] | first }}"
+grafana_rabbitmq_port: "{{ rabbitmq_exporter_port }}"
+grafana_rabbitmq_url: "{{grafana_rabbitmq_host}}:{{grafana_rabbitmq_port}}"

@@ -1,0 +1,63 @@
+---
+# This role will install grafana service on server.
+
+- name: Install grafana package
+  package:
+    name: "{{ grafana_src }}"
+    state: present
+
+- name: Allow incoming TCP traffic on ports
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: yes
+  loop: "{{ grafana_ports }}"
+
+- name: Reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: Start and enable grafana service
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+
+- name: Add prometheus data source
+  grafana_datasource:
+    name: RabbitMQ
+    grafana_url: "{{ grafana_url }}"
+    ds_type: prometheus
+    ds_url: "{{ grafana_prometheus_url }}"
+
+- name: Create dirrectory for grafana
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ grafana_group }}"
+    owner: "{{ grafana_user }}"
+  loop: "{{ grafana_directories }}"
+
+- name: Create rabbitmq.json.j2 file
+  template:
+    src: rabbitmq.json.j2
+    dest: /opt/grafana/rabbitmq.json
+    group: "{{ grafana_group }}"
+    owner: "{{ grafana_user }}"
+
+- name: Create statistics.json.j2 file
+  template:
+    src: statistics.json.j2
+    dest: /opt/grafana/statistics.json
+    group: "{{ grafana_group }}"
+    owner: "{{ grafana_user }}"
+
+# Import didn't work
+
+#- name: Import rabbitmq dashboard
+#  grafana_dashboard:
+#    grafana_url: "{{ grafana_url }}"
+#    state: present
+#    path: "{{ item }}"
+#  loop: "{{ grafana_dashboards }}"

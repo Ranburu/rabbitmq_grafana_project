@@ -1,13 +1,6 @@
 ---
 # This role installs and configure prometheus on the server.
 
-#- name: Disable SELinux
-#  selinux:
-#    state: disabled
-#
-#- name: Unconditionally reboot the machine with all defaults
-#  reboot:
-
 - name: Create user for prometheus service
   user:
     name: "{{ prometheus_user }}"
@@ -38,12 +31,6 @@
     group: "{{ prometheus_group }}"
     owner: "{{ prometheus_user }}"
   loop: "{{ prometheus_bin_files }}"
-
-#- name: Reset SELinux context to prometheus
-#  command: restorecon -rv /usr/local/bin/prometheus
-#
-#- name: Reset SELinux context to promtool
-#  command: restorecon -rv /usr/local/bin/promtool
 
 - name: Move prometheus console files
   copy:

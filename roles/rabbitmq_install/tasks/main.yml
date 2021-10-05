@@ -94,9 +94,6 @@
     group: "{{ rabbitmq_exporter_group }}"
     owner: "{{ rabbitmq_exporter_user }}"
 
-#- name: Reset SELinux context to rabbitmq exporter
-#  command: restorecon -rv /usr/local/bin/rabbitmq_exporter
-
 - name: Start and enable rabbitmq exporter service
   systemd:
     name: rabbitmq_exporter
