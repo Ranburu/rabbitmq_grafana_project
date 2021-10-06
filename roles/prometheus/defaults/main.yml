@@ -20,3 +20,4 @@ prometheus_source: "https://github.com/prometheus/prometheus/releases/download/v
 prometheus_hosts: "localhost"
 prometheus_rabbitmq_hosts: "{{ groups['rabbitmq'] | first }}"
 prometheus_rabbitmq_exporter_port: "{{ rabbitmq_exporter_port }}"
+prometheus_node_exporter_port: "{{ node_exporter_port }}"

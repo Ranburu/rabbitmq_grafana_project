@@ -8,9 +8,10 @@ grafana_ports:
   - "{{grafana_port}}/tcp"
 grafana_directories:
   - /opt/grafana
+  - /var/lib/grafana/dashboards
 grafana_dashboards:
-  - /opt/grafana/rabbitmq.json
-  - /opt/grafana/statistics.json
+  - rabbitmq.json
+  - statistics.json
 grafana_host: "{{ groups['monitoring'] | first }}"
 grafana_url: "http://{{grafana_host}}:{{grafana_port}}"
 grafana_prometheus_host: "{{ groups['monitoring'] | first }}"

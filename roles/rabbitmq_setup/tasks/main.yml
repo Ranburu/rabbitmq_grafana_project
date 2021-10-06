@@ -26,8 +26,9 @@
 
 - name: Create new queue
   rabbitmq_queue:
-    name: myRemoteQueue
+    name: "{{ item }}"
     state: present
     vhost: "{{ rabbitmq_setup_vhost }}"
     login_user: "{{ rabbitmq_setup_admin }}"
     login_password: "{{ rabbitmq_setup_password }}"
+  loop: "{{ rabbitmq_setup_queue }}"

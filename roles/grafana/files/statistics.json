@@ -98,7 +98,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "avg without(cpu) (irate(node_cpu_seconds_total{job=\"rabbitmq_exporter\", instance=\"{{grafana_rabbitmq_url}}\", mode!=\"idle\"}[1m]))",
+          "expr": "avg without(cpu) (irate(node_cpu_seconds_total{mode!=\"idle\"}[1m]))",
           "filter": {
             "fields": []
           },
@@ -171,7 +171,7 @@
           "exemplar": true,
           "expr": "node_systemd_unit_state{name=\"rabbitmq-server.service\", state=\"active\"}",
           "interval": "",
-          "legendFormat": "{{state}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -440,7 +440,7 @@
           "exemplar": true,
           "expr": "node_filesystem_size_bytes{device!~\"/dev/loop.*\", device!~\"tmpfs|nsfs\", device!=\"gvfsd-fuse\"} - node_filesystem_avail_bytes",
           "interval": "",
-          "legendFormat": "{{device}} ",
+          "legendFormat": "{{device}}",
           "refId": "A"
         }
       ],

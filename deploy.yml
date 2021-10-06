@@ -1,17 +1,17 @@
 ---
-## This playbook deploys rabbitmq, grafana and prometheus on the servers.
+# This playbook deploys rabbitmq, grafana and prometheus on the servers.
 
 # Install rabbitmq and management plugin
-#- hosts: rabbitmq
-#  remote_user: root
-#
-#  roles:
-#  - rabbitmq_install
-#  - rabbitmq_setup
+- hosts: rabbitmq
+  remote_user: root
+
+  roles:
+  - rabbitmq_install
+  - rabbitmq_setup
 
 - hosts: monitoring
   remote_user: root
 
   roles:
-#  - prometheus
+  - prometheus
   - grafana

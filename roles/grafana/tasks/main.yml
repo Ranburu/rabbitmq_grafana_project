@@ -28,8 +28,16 @@
   grafana_datasource:
     name: RabbitMQ
     grafana_url: "{{ grafana_url }}"
+    is_default: yes
     ds_type: prometheus
     ds_url: "{{ grafana_prometheus_url }}"
+
+- name: Create local.yml file
+  template:
+    src: local.yml.j2
+    dest: /etc/grafana/provisioning/dashboards/local.yml
+    group: "{{ grafana_group }}"
+    owner: "{{ grafana_user }}"
 
 - name: Create dirrectory for grafana
   file:
@@ -39,25 +47,13 @@
     owner: "{{ grafana_user }}"
   loop: "{{ grafana_directories }}"
 
-- name: Create rabbitmq.json.j2 file
-  template:
-    src: rabbitmq.json.j2
-    dest: /opt/grafana/rabbitmq.json
+- name: Move grafana dashboards to proper folder
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/grafana/dashboards/
     group: "{{ grafana_group }}"
     owner: "{{ grafana_user }}"
+  loop: "{{ grafana_dashboards }}"
 
-- name: Create statistics.json.j2 file
-  template:
-    src: statistics.json.j2
-    dest: /opt/grafana/statistics.json
-    group: "{{ grafana_group }}"
-    owner: "{{ grafana_user }}"
-
-# Import didn't work
-
-#- name: Import rabbitmq dashboard
-#  grafana_dashboard:
-#    grafana_url: "{{ grafana_url }}"
-#    state: present
-#    path: "{{ item }}"
-#  loop: "{{ grafana_dashboards }}"
+- name: Reboot the machine
+  reboot:

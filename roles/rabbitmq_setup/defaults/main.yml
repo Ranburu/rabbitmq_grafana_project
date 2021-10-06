@@ -7,3 +7,5 @@ rabbitmq_setup_users:
   - monitoring
   - service_x
 rabbitmq_setup_vhost: main
+rabbitmq_setup_queue:
+  - service_x

@@ -64,6 +64,42 @@
     group: "{{ rabbitmq_group }}"
     owner: "{{ rabbitmq_user }}"
 
+- name: Download and unarchive node exporter
+  unarchive:
+    remote_src: yes
+    src: "{{ rabbitmq_node_exporter_source }}"
+    dest: "{{ rabbitmq_directory }}"
+
+- name: Create user for node exporter service
+  user:
+    name: "{{ rabbitmq_node_exporter_user }}"
+    create_home: no
+    shell: /bin/false
+    state: present
+
+- name: Move node exporter file to bin folder
+  copy:
+    src: "{{ rabbitmq_node_exporter_directory }}"
+    dest: /usr/local/bin/node_exporter
+    remote_src: yes
+    mode: a+x
+    group: "{{ rabbitmq_node_exporter_group }}"
+    owner: "{{ rabbitmq_node_exporter_user }}"
+
+- name: Create node exporter service
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    group: "{{ rabbitmq_node_exporter_group }}"
+    owner: "{{ rabbitmq_node_exporter_user }}"
+
+- name: Start and enable rabbitmq exporter service
+  systemd:
+    name: node_exporter
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
 - name: Download and unarchive rabbitmq exporter
   unarchive:
     remote_src: yes
@@ -76,7 +112,6 @@
     create_home: no
     shell: /bin/false
     state: present
-
 
 - name: Move rabbitmq exporter file to bin folder
   copy:
